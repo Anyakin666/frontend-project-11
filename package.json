@@ -1,0 +1,25 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "[![Actions Status](https://github.com/Anyakin666/frontend-project-11/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Anyakin666/frontend-project-11/actions)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^10.1.0",
+    "vite": "^8.0.2"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8"
+  },
+  "type": "module"
+}
