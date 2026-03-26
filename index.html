@@ -6,16 +6,31 @@
     <title>RSS Агрегатор</title>
 </head>
 <body>
-    <form id="rss-form">
-        <input 
-            type="text" 
-            id="url-input" 
-            placeholder="Введите URL RSS потока"
-        />
-        <button type="submit">Добавить</button>
-    </form>
-    
-    <div id="feedback"></div>
+    <div class="card-custom">
+        <div class="text-center mb-4">
+            <h1>RSS агрегатор</h1>
+            <p class="subtitle">Начните читать RSS сегодня! Это легко, это красиво.</p>
+        </div>
+        
+        <form id="rss-form">
+            <div class="mb-3">
+                <label for="url-input" class="form-label">Ссылка RSS</label>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="url-input" 
+                        placeholder="https://lorem-rss.hexlet.app/feed"
+                    />
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+                <div class="text-muted-custom">Пример: https://lorem-rss.hexlet.app/feed</div>
+                <div id="url-feedback" class="feedback-custom"></div>
+            </div>
+        </form>
+        
+        <div id="feed-status"></div>
+    </div>
     
     <script type="module" src="/src/main.js"></script>
 </body>
