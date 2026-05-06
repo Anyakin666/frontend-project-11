@@ -1,15 +1,16 @@
-import * as yup from 'yup';
+import yup from './yup-config.js';
+import i18next from 'i18next';
 
-const rssUrlSchema = yup.string()
-  .required('Не должно быть пустым')
-  .url('Ссылка должна быть валидным URL');
+const createRssUrlSchema = (existingUrls) => {
+  return yup.string()
+    .required()
+    .url()
+    .test('unique', i18next.t('errors.duplicate'), (value) => {
+      return !existingUrls.includes(value);
+    });
+};
 
 export const validateRssUrl = (url, existingUrls) => {
-  return rssUrlSchema.validate(url)
-    .then((validUrl) => {
-      if (existingUrls.includes(validUrl)) {
-        throw new Error('RSS уже добавлен');
-      }
-      return validUrl;
-    });
+  const schema = createRssUrlSchema(existingUrls);
+  return schema.validate(url);
 };
