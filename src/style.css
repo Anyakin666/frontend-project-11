@@ -115,3 +115,59 @@ h1 {
         transform: translateY(0);
     }
 }
+
+/* Стили для фидов и постов */
+.feeds-section, .posts-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.feeds-section h2, .posts-section h2 {
+    color: #e9d5ff;
+    font-weight: 600;
+}
+
+.feed-item {
+    background: rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.feed-item:hover {
+    background: rgba(0, 0, 0, 0.3);
+    transform: translateX(4px);
+}
+
+.feed-title {
+    color: #f5d0fe;
+    margin-bottom: 0.5rem;
+}
+
+.feed-description {
+    color: #c4b5fd !important;
+    font-size: 0.85rem;
+}
+
+.post-link {
+    color: #d8b4fe;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.post-link:hover {
+    color: #f5d0fe;
+    text-decoration: underline;
+}
+
+.post-date {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+.post-item {
+    transition: all 0.2s ease;
+}
+
+.post-item:hover {
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.05);
+}

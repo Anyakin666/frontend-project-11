@@ -1,11 +1,14 @@
 import { proxy } from 'valtio/vanilla';
 
+const generateId = () => Date.now().toString() + Math.random().toString(36).substring(2, 6);
+
 export const state = proxy({
-  urls: [],
-  currentUrl: '',
+  feeds: [],      
+  posts: [],      
   error: null,
   isValid: true,
   isSubmitting: false,
+  loading: false,  
 });
 
 export const actions = {
@@ -27,11 +30,23 @@ export const actions = {
     state.isSubmitting = false;
   },
   
-  addUrl: (url) => {
-    state.urls.push(url);
-  },
-  
   setSubmitting: (isSubmitting) => {
     state.isSubmitting = isSubmitting;
+  },
+  
+  setLoading: (isLoading) => {
+    state.loading = isLoading;
+  },
+  
+  addFeed: (feed) => {
+    state.feeds.push(feed);
+  },
+  
+  addPosts: (posts) => {
+    state.posts.push(...posts);
+  },
+  
+  isUrlExists: (url) => {
+    return state.feeds.some(feed => feed.url === url);
   }
 };

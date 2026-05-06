@@ -1,6 +1,8 @@
 import i18next from 'i18next';
 import { validateRssUrl } from './validation.js';
+import { loadRSS } from './rss-loader.js';
 import { state, actions } from './state.js';
+import { renderFeeds, renderPosts } from './view.js';
 
 class RSSReader {
   constructor() {
@@ -29,6 +31,9 @@ class RSSReader {
     }
     
     this.updateUIWithTranslations();
+
+    renderFeeds();
+    renderPosts();
   }
 
   updateUIWithTranslations() {
@@ -47,7 +52,7 @@ class RSSReader {
     if (example) example.textContent = i18next.t('form.example');
   }
 
-  async handleSubmit() {
+  handleSubmit() {
     const url = state.currentUrl.trim();
     
     if (!url) {
@@ -56,15 +61,30 @@ class RSSReader {
     }
     
     actions.setSubmitting(true);
+    actions.setLoading(true);
     this.updateSubmitButton();
     
-    validateRssUrl(url, state.urls)
-      .then((validUrl) => {
-        actions.addUrl(validUrl);
+    validateRssUrl(url)
+      .then(() => loadRSS(url))
+      .then(({ feed, posts }) => {
+        const feedId = Date.now().toString();
+        const feedWithId = { ...feed, id: feedId, url };
+
+        const postsWithFeedId = posts.map(post => ({
+          ...post,
+          feedId: feedId,
+        }));
+
+        actions.addFeed(feedWithId);
+        actions.addPosts(postsWithFeedId);
         actions.clearForm();
         this.clearInputError();
-        this.showMessage(i18next.t('notifications.success'), false, validUrl);
+        
+        this.showMessage(i18next.t('notifications.success'), false, feed.title);
         this.focusInput();
+
+        renderFeeds();
+        renderPosts();
       })
       .catch((error) => {
         let errorMessage = error.message;
@@ -77,15 +97,16 @@ class RSSReader {
       })
       .finally(() => {
         actions.setSubmitting(false);
+        actions.setLoading(false);
         this.updateSubmitButton();
       });
   }
 
-  showMessage(message, isError = false, url = '') {
+  showMessage(message, isError = false, title = '') {
     const statusDiv = document.getElementById('feed-status');
     if (!statusDiv) return;
     
-    const displayMessage = url ? `${message} (${url})` : message;
+    const displayMessage = title ? `${message} "${title}"` : message;
     
     statusDiv.innerHTML = `
       <div class="alert alert-${isError ? 'danger' : 'success'} alert-custom">
@@ -139,7 +160,7 @@ class RSSReader {
   updateSubmitButton() {
     const submitButton = document.querySelector('#rss-form button');
     if (submitButton) {
-      submitButton.disabled = state.isSubmitting;
+      submitButton.disabled = state.isSubmitting || state.loading;
     }
   }
 }
