@@ -31,7 +31,7 @@ class RSSReader {
     }
     
     this.updateUIWithTranslations();
-
+    
     renderFeeds();
     renderPosts();
   }
@@ -69,20 +69,22 @@ class RSSReader {
       .then(({ feed, posts }) => {
         const feedId = Date.now().toString();
         const feedWithId = { ...feed, id: feedId, url };
-
+        
         const postsWithFeedId = posts.map(post => ({
           ...post,
           feedId: feedId,
         }));
-
+        
         actions.addFeed(feedWithId);
         actions.addPosts(postsWithFeedId);
         actions.clearForm();
         this.clearInputError();
         
-        this.showMessage(i18next.t('notifications.success'), false, feed.title);
+        // Простое текстовое сообщение об успехе
+        this.showSuccessMessage();
+        
         this.focusInput();
-
+        
         renderFeeds();
         renderPosts();
       })
@@ -93,7 +95,7 @@ class RSSReader {
         if (error.type === 'unique') errorMessage = i18next.t('errors.duplicate');
         
         this.showInputError(errorMessage);
-        this.showMessage(errorMessage, true);
+        this.showErrorMessage(errorMessage);
       })
       .finally(() => {
         actions.setSubmitting(false);
@@ -102,24 +104,26 @@ class RSSReader {
       });
   }
 
-  showMessage(message, isError = false, title = '') {
+  showSuccessMessage() {
     const statusDiv = document.getElementById('feed-status');
     if (!statusDiv) return;
     
-    const displayMessage = title ? `${message} "${title}"` : message;
-    
     statusDiv.innerHTML = `
-      <div class="alert alert-${isError ? 'danger' : 'success'} alert-custom">
-        ${displayMessage}
+      <div class="success-message-text">
+        RSS успешно загружен
       </div>
     `;
+  }
+
+  showErrorMessage(message) {
+    const statusDiv = document.getElementById('feed-status');
+    if (!statusDiv) return;
     
-    setTimeout(() => {
-      const alert = statusDiv.querySelector('.alert');
-      if (alert) {
-        alert.remove();
-      }
-    }, 5000);
+    statusDiv.innerHTML = `
+      <div class="error-message-text">
+        ${message}
+      </div>
+    `;
   }
 
   showInputError(message) {

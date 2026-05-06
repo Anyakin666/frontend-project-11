@@ -5,21 +5,17 @@ export const renderFeeds = () => {
   if (!feedsContainer) return;
   
   if (state.feeds.length === 0) {
-    feedsContainer.innerHTML = '<p class="text-muted">Нет добавленных фидов</p>';
+    feedsContainer.innerHTML = '<p class="text-muted text-center small">Нет добавленных фидов</p>';
     return;
   }
   
-  const feedsHtml = `
-    <div class="feeds-list">
-      ${state.feeds.map(feed => `
-        <div class="feed-item mb-3 p-3 bg-dark bg-opacity-25 rounded">
-          <h3 class="feed-title h5 mb-2">${escapeHtml(feed.title)}</h3>
-          <p class="feed-description text-muted small mb-1">${escapeHtml(feed.description)}</p>
-          <small class="text-muted">${feed.url}</small>
-        </div>
-      `).join('')}
+  const feedsHtml = state.feeds.map(feed => `
+    <div class="feed-item">
+      <div class="feed-title">${escapeHtml(feed.title)}</div>
+      <div class="feed-description">${escapeHtml(feed.description)}</div>
+      <div class="feed-url small">${escapeHtml(feed.url)}</div>
     </div>
-  `;
+  `).join('');
   
   feedsContainer.innerHTML = feedsHtml;
 };
@@ -29,24 +25,69 @@ export const renderPosts = () => {
   if (!postsContainer) return;
   
   if (state.posts.length === 0) {
-    postsContainer.innerHTML = '<p class="text-muted">Нет добавленных постов</p>';
+    postsContainer.innerHTML = '<p class="text-muted text-center small">Нет добавленных постов</p>';
     return;
   }
   
-  const postsHtml = `
-    <div class="posts-list">
-      ${state.posts.map(post => `
-        <div class="post-item mb-2 p-2 border-bottom">
-          <a href="${escapeHtml(post.link)}" target="_blank" class="post-link">
-            ${escapeHtml(post.title)}
-          </a>
-          <small class="post-date text-muted ms-2">${formatDate(post.pubDate)}</small>
-        </div>
-      `).join('')}
+  const postsHtml = state.posts.map(post => `
+    <div class="post-item d-flex justify-content-between align-items-start">
+      <div class="post-content flex-grow-1">
+        <a href="${escapeHtml(post.link)}" target="_blank" class="post-link">
+          ${escapeHtml(post.title)}
+        </a>
+        <div class="post-date">${formatDate(post.pubDate)}</div>
+      </div>
+      <button 
+        type="button" 
+        class="btn btn-sm btn-outline-primary view-post-btn" 
+        data-post-id="${post.id}"
+        data-bs-toggle="modal" 
+        data-bs-target="#postModal"
+      >
+        Просмотр
+      </button>
     </div>
-  `;
+  `).join('');
   
   postsContainer.innerHTML = postsHtml;
+  
+  attachViewHandlers();
+};
+
+const attachViewHandlers = () => {
+  const viewButtons = document.querySelectorAll('.view-post-btn');
+  viewButtons.forEach(button => {
+    button.removeEventListener('click', handleViewClick);
+    button.addEventListener('click', handleViewClick);
+  });
+};
+
+const handleViewClick = (event) => {
+  const button = event.currentTarget;
+  const postId = button.getAttribute('data-post-id');
+  const post = state.posts.find(p => p.id === postId);
+  
+  if (post) {
+    openModal(post);
+  }
+};
+
+const openModal = (post) => {
+  const modalTitle = document.getElementById('postModalLabel');
+  const modalBody = document.getElementById('postModalBody');
+  const readMoreLink = document.getElementById('readMoreLink');
+  
+  if (modalTitle) {
+    modalTitle.textContent = post.title;
+  }
+  
+  if (modalBody) {
+    modalBody.innerHTML = post.description || 'Нет описания';
+  }
+  
+  if (readMoreLink) {
+    readMoreLink.href = post.link;
+  }
 };
 
 const escapeHtml = (str) => {

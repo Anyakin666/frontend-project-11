@@ -30,16 +30,42 @@
         
         <div id="feed-status"></div>
         
-        <!-- Секция фидов -->
-        <div class="feeds-section mt-4">
-            <h2 class="h4 mb-3">Фиды</h2>
-            <div id="feeds-container"></div>
+        <!-- Двухколоночный макет: посты слева, фиды справа -->
+        <div class="row mt-4">
+            <!-- Посты - левая колонка -->
+            <div class="col-md-8">
+                <div class="posts-section">
+                    <h2 class="h4 mb-3">Посты</h2>
+                    <div id="posts-container"></div>
+                </div>
+            </div>
+            
+            <!-- Фиды - правая колонка -->
+            <div class="col-md-4">
+                <div class="feeds-section">
+                    <h2 class="h4 mb-3">Фиды</h2>
+                    <div id="feeds-container"></div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Секция постов -->
-        <div class="posts-section mt-4">
-            <h2 class="h4 mb-3">Посты</h2>
-            <div id="posts-container"></div>
+    </div>
+    
+    <!-- Модальное окно для просмотра поста -->
+    <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-light">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="postModalLabel">Заголовок поста</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="postModalBody">
+                    Содержимое поста...
+                </div>
+                <div class="modal-footer">
+                    <a href="#" id="readMoreLink" target="_blank" class="btn btn-primary">Читать полностью</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
         </div>
     </div>
     
