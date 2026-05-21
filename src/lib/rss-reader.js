@@ -3,6 +3,7 @@ import { validateRssUrl } from './validation.js';
 import { loadRSS } from './rss-loader.js';
 import { state, actions } from './state.js';
 import { renderFeeds, renderPosts } from './view.js';
+import { startUpdater, stopUpdater } from './updater.js';
 
 class RSSReader {
   constructor() {
@@ -34,6 +35,10 @@ class RSSReader {
     
     renderFeeds();
     renderPosts();
+    
+    if (state.feeds.length > 0) {
+      startUpdater();
+    }
   }
 
   updateUIWithTranslations() {
@@ -80,13 +85,15 @@ class RSSReader {
         actions.clearForm();
         this.clearInputError();
         
-        // Простое текстовое сообщение об успехе
         this.showSuccessMessage();
-        
         this.focusInput();
         
         renderFeeds();
         renderPosts();
+        
+        if (state.feeds.length === 1) {
+          startUpdater();
+        }
       })
       .catch((error) => {
         let errorMessage = error.message;

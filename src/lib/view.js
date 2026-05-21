@@ -29,7 +29,13 @@ export const renderPosts = () => {
     return;
   }
   
-  const postsHtml = state.posts.map(post => `
+  const postsToRender = state.posts.slice().sort((a, b) => {
+    const dateA = new Date(a.pubDate);
+    const dateB = new Date(b.pubDate);
+    return dateB - dateA; 
+  });
+  
+  const postsHtml = postsToRender.map(post => `
     <div class="post-item d-flex justify-content-between align-items-start">
       <div class="post-content flex-grow-1">
         <a href="${escapeHtml(post.link)}" target="_blank" class="post-link">
@@ -50,7 +56,6 @@ export const renderPosts = () => {
   `).join('');
   
   postsContainer.innerHTML = postsHtml;
-  
   attachViewHandlers();
 };
 
@@ -66,10 +71,7 @@ const handleViewClick = (event) => {
   const button = event.currentTarget;
   const postId = button.getAttribute('data-post-id');
   const post = state.posts.find(p => p.id === postId);
-  
-  if (post) {
-    openModal(post);
-  }
+  if (post) openModal(post);
 };
 
 const openModal = (post) => {
@@ -77,17 +79,9 @@ const openModal = (post) => {
   const modalBody = document.getElementById('postModalBody');
   const readMoreLink = document.getElementById('readMoreLink');
   
-  if (modalTitle) {
-    modalTitle.textContent = post.title;
-  }
-  
-  if (modalBody) {
-    modalBody.innerHTML = post.description || 'Нет описания';
-  }
-  
-  if (readMoreLink) {
-    readMoreLink.href = post.link;
-  }
+  if (modalTitle) modalTitle.textContent = post.title;
+  if (modalBody) modalBody.innerHTML = post.description || 'Нет описания';
+  if (readMoreLink) readMoreLink.href = post.link;
 };
 
 const escapeHtml = (str) => {

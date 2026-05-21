@@ -4,11 +4,13 @@ const generateId = () => Date.now().toString() + Math.random().toString(36).subs
 
 export const state = proxy({
   feeds: [],      
-  posts: [],      
+  posts: [],     
+  currentUrl: '',
   error: null,
   isValid: true,
   isSubmitting: false,
-  loading: false,  
+  loading: false,
+  updateTimer: null, 
 });
 
 export const actions = {
@@ -43,10 +45,24 @@ export const actions = {
   },
   
   addPosts: (posts) => {
-    state.posts.push(...posts);
+    const existingLinks = new Set(state.posts.map(p => p.link));
+    const newPosts = posts.filter(post => !existingLinks.has(post.link));
+    state.posts.push(...newPosts);
+    return newPosts.length; 
   },
   
   isUrlExists: (url) => {
     return state.feeds.some(feed => feed.url === url);
+  },
+  
+  setUpdateTimer: (timer) => {
+    state.updateTimer = timer;
+  },
+  
+  clearUpdateTimer: () => {
+    if (state.updateTimer) {
+      clearTimeout(state.updateTimer);
+      state.updateTimer = null;
+    }
   }
 };
