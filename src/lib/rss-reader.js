@@ -3,7 +3,7 @@ import { validateRssUrl } from './validation.js';
 import { loadRSS } from './rss-loader.js';
 import { state, actions } from './state.js';
 import { renderFeeds, renderPosts } from './view.js';
-import { startUpdater, stopUpdater } from './updater.js';
+import { startUpdater } from './updater.js';
 
 class RSSReader {
   constructor() {
@@ -48,6 +48,10 @@ class RSSReader {
     const button = document.querySelector('#rss-form button');
     const placeholder = document.querySelector('#url-input');
     const example = document.querySelector('.example');
+    const feedsTitle = document.querySelector('.feeds-section h2');
+    const postsTitle = document.querySelector('.posts-section h2');
+    const readMoreLink = document.getElementById('readMoreLink');
+    const closeButton = document.querySelector('.modal-footer .btn-secondary');
     
     if (title) title.textContent = i18next.t('app.title');
     if (subtitle) subtitle.textContent = i18next.t('app.subtitle');
@@ -55,6 +59,10 @@ class RSSReader {
     if (button) button.textContent = i18next.t('form.button');
     if (placeholder) placeholder.placeholder = i18next.t('form.placeholder');
     if (example) example.textContent = i18next.t('form.example');
+    if (feedsTitle) feedsTitle.textContent = i18next.t('sections.feeds');
+    if (postsTitle) postsTitle.textContent = i18next.t('sections.posts');
+    if (readMoreLink) readMoreLink.textContent = i18next.t('buttons.readFull');
+    if (closeButton) closeButton.textContent = i18next.t('buttons.close');
   }
 
   handleSubmit() {
@@ -97,9 +105,18 @@ class RSSReader {
       })
       .catch((error) => {
         let errorMessage = error.message;
-        if (error.type === 'required') errorMessage = i18next.t('errors.required');
-        if (error.type === 'url') errorMessage = i18next.t('errors.url');
-        if (error.type === 'unique') errorMessage = i18next.t('errors.duplicate');
+        
+        if (error.message.includes('Невалидный RSS') || error.message.includes('не содержит канала')) {
+          errorMessage = i18next.t('errors.invalidRss');
+        } else if (error.type === 'required') {
+          errorMessage = i18next.t('errors.required');
+        } else if (error.type === 'url') {
+          errorMessage = i18next.t('errors.url');
+        } else if (error.type === 'unique') {
+          errorMessage = i18next.t('errors.duplicate');
+        } else if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+          errorMessage = i18next.t('errors.networkError');
+        }
         
         this.showInputError(errorMessage);
         this.showErrorMessage(errorMessage);
@@ -117,7 +134,7 @@ class RSSReader {
     
     statusDiv.innerHTML = `
       <div class="success-message-text">
-        RSS успешно загружен
+        ${i18next.t('notifications.success')}
       </div>
     `;
   }

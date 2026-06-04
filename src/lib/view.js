@@ -1,4 +1,6 @@
+import i18next from 'i18next';
 import { state, actions } from './state.js';
+import { Modal } from 'bootstrap';
 
 export const renderFeeds = () => {
   const feedsContainer = document.getElementById('feeds-container');
@@ -51,10 +53,8 @@ export const renderPosts = () => {
           type="button" 
           class="btn btn-sm btn-outline-primary view-post-btn" 
           data-post-id="${post.id}"
-          data-bs-toggle="modal" 
-          data-bs-target="#postModal"
         >
-          Просмотр
+          ${i18next.t('buttons.view')}
         </button>
       </div>
     `;
@@ -62,6 +62,16 @@ export const renderPosts = () => {
   
   postsContainer.innerHTML = postsHtml;
   attachViewHandlers();
+};
+
+let modalInstance = null;
+
+const getModal = () => {
+  if (!modalInstance) {
+    const modalElement = document.getElementById('postModal');
+    modalInstance = new Modal(modalElement);
+  }
+  return modalInstance;
 };
 
 const attachViewHandlers = () => {
@@ -78,8 +88,10 @@ const handleViewClick = (event) => {
   const post = state.posts.find(p => p.id === postId);
   
   if (post) {
+    // Отмечаем как прочитанный
     actions.markPostAsRead(post.id);
     
+    // Обновляем стиль в списке
     const postItem = document.querySelector(`.post-item[data-post-id="${post.id}"]`);
     if (postItem) {
       const link = postItem.querySelector('.post-link');
@@ -89,25 +101,26 @@ const handleViewClick = (event) => {
       }
     }
     
-    openModal(post);
-  }
-};
-
-const openModal = (post) => {
-  const modalTitle = document.getElementById('postModalLabel');
-  const modalBody = document.getElementById('postModalBody');
-  const readMoreLink = document.getElementById('readMoreLink');
-  
-  if (modalTitle) {
-    modalTitle.textContent = post.title;
-  }
-  
-  if (modalBody) {
-    modalBody.innerHTML = post.description || 'Нет описания';
-  }
-  
-  if (readMoreLink) {
-    readMoreLink.href = post.link;
+    // Заполняем модальное окно
+    const modalTitle = document.getElementById('postModalLabel');
+    const modalBody = document.getElementById('postModalBody');
+    const readMoreLink = document.getElementById('readMoreLink');
+    
+    if (modalTitle) {
+      modalTitle.textContent = post.title;
+    }
+    
+    if (modalBody) {
+      modalBody.innerHTML = post.description || i18next.t('modal.goal');
+    }
+    
+    if (readMoreLink) {
+      readMoreLink.href = post.link;
+    }
+    
+    // Открываем модалку
+    const modal = getModal();
+    modal.show();
   }
 };
 

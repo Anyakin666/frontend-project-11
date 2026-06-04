@@ -15,13 +15,28 @@ export default {
     errors: {
       required: 'Не должно быть пустым',
       url: 'Ссылка должна быть валидным URL',
-      duplicate: 'RSS уже добавлен'
+      duplicate: 'RSS уже существует',
+      invalidRss: 'Ресурс не содержит валидный RSS',
+      networkError: 'Ошибка сети'
     },
     
-    // Уведомления
     notifications: {
-      success: 'RSS поток успешно добавлен!',
-      error: 'Ошибка'
+      success: 'RSS успешно загружен'
+    },
+    
+    buttons: {
+      view: 'Просмотр',
+      close: 'Закрыть',
+      readFull: 'Читать полностью'
+    },
+    
+    sections: {
+      feeds: 'Фиды',
+      posts: 'Посты'
+    },
+    
+    modal: {
+      goal: 'Цель: Научиться извлекать из дерева необходимые данные'
     }
   }
 };
