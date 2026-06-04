@@ -69,6 +69,7 @@ class RSSReader {
     const url = state.currentUrl.trim();
     
     if (!url) {
+      this.showFeedback(i18next.t('errors.required'), true);
       this.showInputError(i18next.t('errors.required'));
       return;
     }
@@ -93,7 +94,7 @@ class RSSReader {
         actions.clearForm();
         this.clearInputError();
         
-        this.showSuccessMessage();
+        this.showFeedback(i18next.t('notifications.success'));
         this.focusInput();
         
         renderFeeds();
@@ -118,8 +119,8 @@ class RSSReader {
           errorMessage = i18next.t('errors.networkError');
         }
         
+        this.showFeedback(errorMessage, true);
         this.showInputError(errorMessage);
-        this.showErrorMessage(errorMessage);
       })
       .finally(() => {
         actions.setSubmitting(false);
@@ -128,53 +129,41 @@ class RSSReader {
       });
   }
 
-  showSuccessMessage() {
-    const statusDiv = document.getElementById('feed-status');
-    if (!statusDiv) return;
+  showFeedback(message, isError = false) {
+    const feedbackDiv = document.querySelector('.feedback');
+    if (!feedbackDiv) return;
     
-    statusDiv.innerHTML = `
-      <div class="success-message-text">
-        ${i18next.t('notifications.success')}
-      </div>
-    `;
-  }
-
-  showErrorMessage(message) {
-    const statusDiv = document.getElementById('feed-status');
-    if (!statusDiv) return;
+    feedbackDiv.innerHTML = message;
+    feedbackDiv.style.color = isError ? '#f87171' : '#22c55e';
+    feedbackDiv.style.marginTop = '0.5rem';
+    feedbackDiv.style.fontSize = '0.8rem';
     
-    statusDiv.innerHTML = `
-      <div class="error-message-text">
-        ${message}
-      </div>
-    `;
+    setTimeout(() => {
+      if (feedbackDiv.innerHTML === message) {
+        feedbackDiv.innerHTML = '';
+      }
+    }, 5000);
   }
 
   showInputError(message) {
     const urlInput = document.getElementById('url-input');
-    const feedback = document.getElementById('url-feedback');
-    
     if (urlInput) {
       urlInput.classList.add('is-invalid');
-    }
-    
-    if (feedback) {
-      feedback.textContent = message;
-      feedback.classList.add('error');
     }
   }
 
   clearInputError() {
     const urlInput = document.getElementById('url-input');
-    const feedback = document.getElementById('url-feedback');
-    
     if (urlInput) {
       urlInput.classList.remove('is-invalid');
     }
-    
-    if (feedback) {
-      feedback.textContent = '';
-      feedback.classList.remove('error');
+    const feedbackDiv = document.querySelector('.feedback');
+    if (feedbackDiv && feedbackDiv.innerHTML !== '') {
+      setTimeout(() => {
+        if (feedbackDiv.innerHTML === feedbackDiv.innerHTML) {
+          feedbackDiv.innerHTML = '';
+        }
+      }, 3000);
     }
   }
 
