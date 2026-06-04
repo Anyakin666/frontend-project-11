@@ -71,7 +71,7 @@ let modalInstance = null;
 
 const getModal = () => {
   if (!modalInstance) {
-    const modalElement = document.getElementById('postModal');
+    const modalElement = document.getElementById('modal');
     modalInstance = new Modal(modalElement);
   }
   return modalInstance;
@@ -102,8 +102,8 @@ const handleViewClick = (event) => {
       }
     }
     
-    const modalTitle = document.getElementById('postModalLabel');
-    const modalBody = document.getElementById('postModalBody');
+    const modalTitle = document.getElementById('modalLabel');
+    const modalBody = document.getElementById('modalBody');
     const readMoreLink = document.getElementById('readMoreLink');
     
     if (modalTitle) {
