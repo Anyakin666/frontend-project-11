@@ -13,9 +13,8 @@ export const renderFeeds = () => {
   
   const feedsHtml = state.feeds.map(feed => `
     <div class="feed-item">
-      <div class="feed-title">${escapeHtml(feed.title)}</div>
-      <div class="feed-description">${escapeHtml(feed.description)}</div>
-      <div class="feed-url small">${escapeHtml(feed.url)}</div>
+      <h3 class="feed-title h6">${escapeHtml(feed.title)}</h3>
+      <p class="feed-description text-muted small">${escapeHtml(feed.description)}</p>
     </div>
   `).join('');
   
@@ -37,28 +36,32 @@ export const renderPosts = () => {
     return dateB - dateA;
   });
   
-  const postsHtml = postsToRender.map(post => {
-    const isRead = actions.isPostRead(post.id);
-    const titleClass = isRead ? 'fw-normal' : 'fw-bold';
-    
-    return `
-      <div class="post-item d-flex justify-content-between align-items-start" data-post-id="${post.id}">
-        <div class="post-content flex-grow-1">
-          <a href="${escapeHtml(post.link)}" target="_blank" class="post-link ${titleClass}">
-            ${escapeHtml(post.title)}
-          </a>
-          <div class="post-date">${formatDate(post.pubDate)}</div>
-        </div>
-        <button 
-          type="button" 
-          class="btn btn-sm btn-outline-primary view-post-btn" 
-          data-post-id="${post.id}"
-        >
-          ${i18next.t('buttons.view')}
-        </button>
-      </div>
-    `;
-  }).join('');
+  const postsHtml = `
+    <div class="list-unstyled">
+      ${postsToRender.map(post => {
+        const isRead = actions.isPostRead(post.id);
+        const titleClass = isRead ? 'fw-normal' : 'fw-bold';
+        
+        return `
+          <li class="post-item d-flex justify-content-between align-items-start mb-2" data-post-id="${post.id}">
+            <div class="post-content flex-grow-1">
+              <a href="${escapeHtml(post.link)}" target="_blank" class="post-link ${titleClass}">
+                ${escapeHtml(post.title)}
+              </a>
+              <div class="post-date small text-muted">${formatDate(post.pubDate)}</div>
+            </div>
+            <button 
+              type="button" 
+              class="btn btn-sm btn-outline-primary view-post-btn" 
+              data-post-id="${post.id}"
+            >
+              ${i18next.t('buttons.view')}
+            </button>
+          </li>
+        `;
+      }).join('')}
+    </div>
+  `;
   
   postsContainer.innerHTML = postsHtml;
   attachViewHandlers();
@@ -88,10 +91,8 @@ const handleViewClick = (event) => {
   const post = state.posts.find(p => p.id === postId);
   
   if (post) {
-    // Отмечаем как прочитанный
     actions.markPostAsRead(post.id);
     
-    // Обновляем стиль в списке
     const postItem = document.querySelector(`.post-item[data-post-id="${post.id}"]`);
     if (postItem) {
       const link = postItem.querySelector('.post-link');
@@ -101,7 +102,6 @@ const handleViewClick = (event) => {
       }
     }
     
-    // Заполняем модальное окно
     const modalTitle = document.getElementById('postModalLabel');
     const modalBody = document.getElementById('postModalBody');
     const readMoreLink = document.getElementById('readMoreLink');
@@ -111,14 +111,13 @@ const handleViewClick = (event) => {
     }
     
     if (modalBody) {
-      modalBody.innerHTML = post.description || i18next.t('modal.goal');
+      modalBody.innerHTML = post.description || 'Описание отсутствует';
     }
     
     if (readMoreLink) {
       readMoreLink.href = post.link;
     }
     
-    // Открываем модалку
     const modal = getModal();
     modal.show();
   }
