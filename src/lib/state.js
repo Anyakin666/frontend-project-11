@@ -3,14 +3,15 @@ import { proxy } from 'valtio/vanilla';
 const generateId = () => Date.now().toString() + Math.random().toString(36).substring(2, 6);
 
 export const state = proxy({
-  feeds: [],      
-  posts: [],     
+  feeds: [],
+  posts: [],
+  readPostsIds: new Set(), 
   currentUrl: '',
   error: null,
   isValid: true,
   isSubmitting: false,
   loading: false,
-  updateTimer: null, 
+  updateTimer: null,
 });
 
 export const actions = {
@@ -48,7 +49,7 @@ export const actions = {
     const existingLinks = new Set(state.posts.map(p => p.link));
     const newPosts = posts.filter(post => !existingLinks.has(post.link));
     state.posts.push(...newPosts);
-    return newPosts.length; 
+    return newPosts.length;
   },
   
   isUrlExists: (url) => {
@@ -64,5 +65,13 @@ export const actions = {
       clearTimeout(state.updateTimer);
       state.updateTimer = null;
     }
+  },
+  
+  markPostAsRead: (postId) => {
+    state.readPostsIds.add(postId);
+  },
+  
+  isPostRead: (postId) => {
+    return state.readPostsIds.has(postId);
   }
 };

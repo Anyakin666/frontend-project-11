@@ -1,4 +1,4 @@
-import { state } from './state.js';
+import { state, actions } from './state.js';
 
 export const renderFeeds = () => {
   const feedsContainer = document.getElementById('feeds-container');
@@ -29,31 +29,36 @@ export const renderPosts = () => {
     return;
   }
   
-  const postsToRender = state.posts.slice().sort((a, b) => {
+  const postsToRender = [...state.posts].sort((a, b) => {
     const dateA = new Date(a.pubDate);
     const dateB = new Date(b.pubDate);
-    return dateB - dateA; 
+    return dateB - dateA;
   });
   
-  const postsHtml = postsToRender.map(post => `
-    <div class="post-item d-flex justify-content-between align-items-start">
-      <div class="post-content flex-grow-1">
-        <a href="${escapeHtml(post.link)}" target="_blank" class="post-link">
-          ${escapeHtml(post.title)}
-        </a>
-        <div class="post-date">${formatDate(post.pubDate)}</div>
+  const postsHtml = postsToRender.map(post => {
+    const isRead = actions.isPostRead(post.id);
+    const titleClass = isRead ? 'fw-normal' : 'fw-bold';
+    
+    return `
+      <div class="post-item d-flex justify-content-between align-items-start" data-post-id="${post.id}">
+        <div class="post-content flex-grow-1">
+          <a href="${escapeHtml(post.link)}" target="_blank" class="post-link ${titleClass}">
+            ${escapeHtml(post.title)}
+          </a>
+          <div class="post-date">${formatDate(post.pubDate)}</div>
+        </div>
+        <button 
+          type="button" 
+          class="btn btn-sm btn-outline-primary view-post-btn" 
+          data-post-id="${post.id}"
+          data-bs-toggle="modal" 
+          data-bs-target="#postModal"
+        >
+          Просмотр
+        </button>
       </div>
-      <button 
-        type="button" 
-        class="btn btn-sm btn-outline-primary view-post-btn" 
-        data-post-id="${post.id}"
-        data-bs-toggle="modal" 
-        data-bs-target="#postModal"
-      >
-        Просмотр
-      </button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
   
   postsContainer.innerHTML = postsHtml;
   attachViewHandlers();
@@ -71,7 +76,21 @@ const handleViewClick = (event) => {
   const button = event.currentTarget;
   const postId = button.getAttribute('data-post-id');
   const post = state.posts.find(p => p.id === postId);
-  if (post) openModal(post);
+  
+  if (post) {
+    actions.markPostAsRead(post.id);
+    
+    const postItem = document.querySelector(`.post-item[data-post-id="${post.id}"]`);
+    if (postItem) {
+      const link = postItem.querySelector('.post-link');
+      if (link) {
+        link.classList.remove('fw-bold');
+        link.classList.add('fw-normal');
+      }
+    }
+    
+    openModal(post);
+  }
 };
 
 const openModal = (post) => {
@@ -79,9 +98,17 @@ const openModal = (post) => {
   const modalBody = document.getElementById('postModalBody');
   const readMoreLink = document.getElementById('readMoreLink');
   
-  if (modalTitle) modalTitle.textContent = post.title;
-  if (modalBody) modalBody.innerHTML = post.description || 'Нет описания';
-  if (readMoreLink) readMoreLink.href = post.link;
+  if (modalTitle) {
+    modalTitle.textContent = post.title;
+  }
+  
+  if (modalBody) {
+    modalBody.innerHTML = post.description || 'Нет описания';
+  }
+  
+  if (readMoreLink) {
+    readMoreLink.href = post.link;
+  }
 };
 
 const escapeHtml = (str) => {
