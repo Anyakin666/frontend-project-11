@@ -40,12 +40,13 @@ export const renderPosts = () => {
     <div class="list-unstyled">
       ${postsToRender.map(post => {
         const isRead = actions.isPostRead(post.id);
-        const titleClass = isRead ? 'fw-normal' : 'fw-bold';
+        // Тесты ожидают link-secondary для прочитанных, fw-bold для новых
+        const linkClass = isRead ? 'link-secondary' : 'fw-bold';
         
         return `
           <li class="post-item d-flex justify-content-between align-items-start mb-2" data-post-id="${post.id}">
             <div class="post-content flex-grow-1">
-              <a href="${escapeHtml(post.link)}" target="_blank" class="post-link ${titleClass}">
+              <a href="${escapeHtml(post.link)}" target="_blank" class="post-link ${linkClass}">
                 ${escapeHtml(post.title)}
               </a>
               <div class="post-date small text-muted">${formatDate(post.pubDate)}</div>
@@ -98,7 +99,7 @@ const handleViewClick = (event) => {
       const link = postItem.querySelector('.post-link');
       if (link) {
         link.classList.remove('fw-bold');
-        link.classList.add('fw-normal');
+        link.classList.add('link-secondary');
       }
     }
     
